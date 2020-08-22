@@ -1,0 +1,15 @@
+{
+  "name": "socket.io-chat-app",
+  "version": "1.0.0",
+  "description": "Socket.io Chat App using Vuejs and Socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Golam Sorwar <akibmd719@gmail.com> (https://golamsorwar.com)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  }
+}
