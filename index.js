@@ -12,7 +12,15 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('a user disconnect');
   });
-  
+
+  socket.on('Created', (data) => {
+    socket.broadcast.emit('Created',(data));
+  });
+
+  socket.on('chat-message', (data) => {
+    socket.broadcast.emit('chat-message',(data));
+  });
+
 });
 
 http.listen(3000, () => {

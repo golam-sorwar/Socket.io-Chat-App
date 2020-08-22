@@ -4,12 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket.io Chat App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
 <body>
-    <h1>Socket.io Chat App</h1>
+    <div id="app">
+        <div class="container">
+            <div class="col-lg-6 offset-lg-3 mt-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        Chat App
+                    </div>
+
+                    <ul class="list-group list-group-flush h3">
+                        <li class="list-group-item" v-for="message in messages" style="border: none !important;font-size: x-large;">
+                            <span
+                                :class="message.type=='sending' ? 'float-right badge badge-pill badge-info':'float-left badge badge-pill badge-primary'">{{ message.message }}</span>
+                        </li>
+                    </ul>
+
+                    <div class="card-body">
+                        <form @submit.prevent="send">
+                            <div class="form-group">
+                                <input class="form-control" type="text" v-model="newMessage" placeholder="Type Here">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
+        var app = new Vue({
+            el: '#app',
+            data:{
+                newMessage: null,
+                messages: []
+            },
+            methods:{
+                send(){
+                    this.messages.push({message:this.newMessage, type:'sending'});
+                    socket.emit('chat-message', this.newMessage);
+                    this.newMessage = null;
+                }
+            },
+            created(){
+                socket.emit('Created', 'Akib');
+                socket.on('Created', (data) => {
+                    console.log(data);
+                });
+                socket.on('chat-message', (data) => {
+                    this.messages.push({message:data ,type:'receiving'});
+                });
+            }
+        });
     </script>
 </body>
 </html>
