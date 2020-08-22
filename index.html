@@ -21,12 +21,17 @@
                             <span
                                 :class="message.type=='sending' ? 'float-right badge badge-pill badge-info':'float-left badge badge-pill badge-primary'">{{ message.message }}</span>
                         </li>
+                        <li class="list-group-item" v-if="typing" style="border: none !important;">
+                            <div class="spinner-grow text-warning" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </li>
                     </ul>
 
                     <div class="card-body">
                         <form @submit.prevent="send">
                             <div class="form-group">
-                                <input class="form-control" type="text" v-model="newMessage" placeholder="Type Here">
+                                <input class="form-control" type="text" v-model="newMessage" placeholder="Type a message...">
                             </div>
                         </form>
                     </div>
@@ -44,7 +49,13 @@
             el: '#app',
             data:{
                 newMessage: null,
-                messages: []
+                messages: [],
+                typing: false
+            },
+            watch:{
+                newMessage(value){
+                    value ? socket.emit('user-typing') : socket.emit('user-stopTyping')
+                }
             },
             methods:{
                 send(){
@@ -54,12 +65,19 @@
                 }
             },
             created(){
-                socket.emit('Created', 'Akib');
                 socket.on('Created', (data) => {
                     console.log(data);
                 });
                 socket.on('chat-message', (data) => {
                     this.messages.push({message:data ,type:'receiving'});
+                });
+
+                socket.on('user-typing', () => {
+                    this.typing = true;
+                });
+
+                socket.on('user-stopTyping', () => {
+                    this.typing = false;
                 });
             }
         });

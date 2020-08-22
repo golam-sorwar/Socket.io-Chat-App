@@ -7,7 +7,6 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
 
   socket.on('disconnect', () => {
     console.log('a user disconnect');
@@ -19,6 +18,14 @@ io.on('connection', (socket) => {
 
   socket.on('chat-message', (data) => {
     socket.broadcast.emit('chat-message',(data));
+  });
+
+  socket.on('user-typing', (data) => {
+    socket.broadcast.emit('user-typing',(data));
+  });
+
+  socket.on('user-stopTyping', (data) => {
+    socket.broadcast.emit('user-stopTyping',(data));
   });
 
 });
