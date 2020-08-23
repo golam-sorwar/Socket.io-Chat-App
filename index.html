@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Socket.io Chat App</title>
+    <title>Chat App</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 </head>
@@ -12,8 +12,8 @@
         <div class="container">
             <div class="col-lg-6 offset-lg-3 mt-4">
                 <div class="card">
-                    <div class="card-header bg-success text-white">
-                        Chat App
+                    <div class="card-header bg-success text-white text-center">
+                        <span class="badge badge-light h4" v-if="ready">{{ name }}</span> Chat App
                     </div>
 
                     <ul class="list-group list-group-flush h3">
@@ -28,13 +28,26 @@
                         </li>
                     </ul>
 
-                    <div class="card-body">
+                    <div class="card-body" v-if="ready">
                         <form @submit.prevent="send">
                             <div class="form-group">
                                 <input class="form-control" type="text" v-model="newMessage" placeholder="Type a message...">
                             </div>
                         </form>
                     </div>
+
+                    <div class="card-body" v-if="!ready">
+                        <h4 class="text-secondary">Set Your Name</h4>
+                        <form @submit.prevent="addName">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" v-model="name" placeholder="Give your name..." required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-dark" type="submit">Button</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -50,7 +63,10 @@
             data:{
                 newMessage: null,
                 messages: [],
-                typing: false
+                typing: false,
+                name: null,
+                ready:false,
+                info:[]
             },
             watch:{
                 newMessage(value){
@@ -62,12 +78,21 @@
                     this.messages.push({message:this.newMessage, type:'sending'});
                     socket.emit('chat-message', this.newMessage);
                     this.newMessage = null;
+                },
+                addName(){
+                    this.ready = true;
+                    socket.emit('joined', this.name);
                 }
             },
             created(){
+                window.onbeforeunload = () => {
+                    socket.emit('leaved',this.name);
+                }
+
                 socket.on('Created', (data) => {
                     console.log(data);
                 });
+
                 socket.on('chat-message', (data) => {
                     this.messages.push({message:data ,type:'receiving'});
                 });
@@ -78,6 +103,14 @@
 
                 socket.on('user-stopTyping', () => {
                     this.typing = false;
+                });
+
+                socket.on('joined', (data) => {
+                    this.info.push({name:data,type:'Joined'});
+                });
+
+                socket.on('leaved', (data) => {
+                    this.info.push({name:data,type:'Leaved'});
                 });
             }
         });

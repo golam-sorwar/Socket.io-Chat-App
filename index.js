@@ -28,6 +28,14 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('user-stopTyping',(data));
   });
 
+  socket.on('joined', (data) => {
+    socket.broadcast.emit('joined',(data));
+  });
+
+  socket.on('leaved', (data) => {
+    socket.broadcast.emit('leaved',(data));
+  });
+
 });
 
 http.listen(3000, () => {
