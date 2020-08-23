@@ -18,7 +18,8 @@
                 </div>
                 <div class="card">
                     <div class="card-header bg-success text-white text-center">
-                        Chat App <br>
+                        <!-- <span class="float-right">{{ connections }} Connections</span> -->
+                        Chat App<br>
                         <span class="badge badge-light h4 text-capitalize" v-if="ready">{{ name }}</span>
                     </div>
 
@@ -74,7 +75,8 @@
                 typing: false,
                 name: null,
                 ready: false,
-                info: []
+                info: [],
+                connections: 0
             },
             watch:{
                 newMessage(value){
@@ -96,6 +98,10 @@
                 window.onbeforeunload = () => {
                     socket.emit('leaved', this.name);
                 }
+
+                socket.on('connections', (data) => {
+                    this.connections = data;
+                })
 
                 socket.on('Created', (data) => {
                     console.log(data);
