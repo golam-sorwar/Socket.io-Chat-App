@@ -11,15 +11,23 @@
     <div id="app">
         <div class="container">
             <div class="col-lg-6 offset-lg-3 mt-4">
+                <div v-if="ready">
+                    <div class="alert alert-success text-capitalize" role="alert" v-for="item in info">
+                            {{ item.name }} {{ item.type }}
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header bg-success text-white text-center">
-                        <span class="badge badge-light h4" v-if="ready">{{ name }}</span> Chat App
+                        Chat App <br>
+                        <span class="badge badge-light h4 text-capitalize" v-if="ready">{{ name }}</span>
                     </div>
 
                     <ul class="list-group list-group-flush h3">
                         <li class="list-group-item" v-for="message in messages" style="border: none !important;font-size: x-large;">
-                            <span
-                                :class="message.type=='sending' ? 'float-right badge badge-pill badge-info':'float-left badge badge-pill badge-primary'">{{ message.message }}</span>
+                            <span :class="message.type=='sending' ? 'float-right badge badge-pill badge-info':'float-left badge badge-pill badge-primary'">
+                                {{ message.message }}
+                                <small class="badge badge-light text-capitalize"> {{ message.by }}</small>
+                            </span>
                         </li>
                         <li class="list-group-item" v-if="typing" style="border: none !important;">
                             <div class="spinner-grow text-warning" role="status">
@@ -65,8 +73,8 @@
                 messages: [],
                 typing: false,
                 name: null,
-                ready:false,
-                info:[]
+                ready: false,
+                info: []
             },
             watch:{
                 newMessage(value){
@@ -75,8 +83,8 @@
             },
             methods:{
                 send(){
-                    this.messages.push({message:this.newMessage, type:'sending'});
-                    socket.emit('chat-message', this.newMessage);
+                    this.messages.push({message:this.newMessage, type:'sending', by:'Me'});
+                    socket.emit('chat-message', {message:this.newMessage,user:this.name});
                     this.newMessage = null;
                 },
                 addName(){
@@ -86,7 +94,7 @@
             },
             created(){
                 window.onbeforeunload = () => {
-                    socket.emit('leaved',this.name);
+                    socket.emit('leaved', this.name);
                 }
 
                 socket.on('Created', (data) => {
@@ -94,7 +102,7 @@
                 });
 
                 socket.on('chat-message', (data) => {
-                    this.messages.push({message:data ,type:'receiving'});
+                    this.messages.push({message:data.message, type:'receiving', by:data.user});
                 });
 
                 socket.on('user-typing', () => {
@@ -106,11 +114,17 @@
                 });
 
                 socket.on('joined', (data) => {
-                    this.info.push({name:data,type:'Joined'});
+                    this.info.push({name: data, type:'Joined'});
+                    setTimeout(() => {
+                        this.info = []
+                    }, 5000);
                 });
 
                 socket.on('leaved', (data) => {
-                    this.info.push({name:data,type:'Leaved'});
+                    this.info.push({name:data, type:' Leaved'});
+                    setTimeout(() => {
+                        this.info = []
+                    }, 5000);
                 });
             }
         });

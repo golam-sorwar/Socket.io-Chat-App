@@ -8,9 +8,9 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
 
-  socket.on('disconnect', () => {
-    console.log('a user disconnect');
-  });
+//   socket.on('disconnect', () => {
+//     console.log('a user disconnect');
+//   });
 
   socket.on('Created', (data) => {
     socket.broadcast.emit('Created',(data));
@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leaved', (data) => {
-    socket.broadcast.emit('leaved',(data));
+    socket.broadcast.emit('leaved', (data));
   });
 
 });
